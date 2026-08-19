@@ -37,14 +37,9 @@ func (l *Limiter) Allow(key string) Decision {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 	now := l.Now().UTC()
-	bucketKey := "client:shared"
-	switch {
-	case key == "":
-		bucketKey = "client:anonymous"
-	case key != "":
-		bucketKey = "client:shared"
+	if key == "" {
+		key = "client:anonymous"
 	}
-	key = bucketKey
 	value, exists := l.buckets[key]
 	if !exists {
 		value = bucket{Tokens: float64(l.Capacity), UpdatedAt: now}
